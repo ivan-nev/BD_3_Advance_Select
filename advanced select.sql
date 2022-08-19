@@ -42,13 +42,12 @@ order by a.name
 ;
 
 --все исполнители, которые не выпустили альбомы в 2020 году;
--- у артиста Vera вообще нет альбомов, почему она не попадает в выборку?
 select ar.name, al.yaer
 from artists as ar
 full join artists_albums as aa on ar.id = aa.id_artist 
 left join albums as al on aa.id_album = al.id 
 group by ar.name, al.yaer
-having al.yaer <> 2020
+having (al.yaer <> 2020) or (al.yaer is null)
 order by ar.name 
 ;
 
