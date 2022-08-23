@@ -42,6 +42,7 @@ order by a.name
 ;
 
 --все исполнители, которые не выпустили альбомы в 2020 году;
+  -- не верно т.к Kuk Kukovich выпустил в 20 и 22, а в список попал
 select ar.name, al.yaer
 from artists as ar
 full join artists_albums as aa on ar.id = aa.id_artist 
@@ -50,6 +51,17 @@ group by ar.name, al.yaer
 having (al.yaer <> 2020) or (al.yaer is null)
 order by ar.name 
 ;
+--правильный вариант
+SELECT DISTINCT a.name  FROM artists a 
+	WHERE a.name NOT IN (
+		SELECT DISTINCT a.name FROM artists a 
+		LEFT JOIN Artists_Albums aa ON a.id = aa.id_artist 
+		LEFT JOIN Albums al ON al.id = aa.id_album  
+		WHERE al.yaer = 2020
+		)
+	ORDER BY a.name;
+
+
 
 --названия сборников, в которых присутствует конкретный исполнитель (выберите сами)
 select ar.name, col.name
@@ -88,6 +100,16 @@ left join albums as al on aa.id_album = al.id
 left join tracks as tr on al.id = tr.id_album 
 group by ar.name, tr.duration 
 having tr.duration = (select min(duration) from tracks)
+
+--или
+select distinct ar.name, tr.duration
+from artists as ar
+left join artists_albums as aa on ar.id = aa.id_artist 
+left join albums as al on aa.id_album = al.id 
+left join tracks as tr on al.id = tr.id_album 
+where tr.duration = (select min(duration) from tracks)
+
+
 
 -- название альбомов, содержащих наименьшее количество треков
 select a.name, count(t.name)
